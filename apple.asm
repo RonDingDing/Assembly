@@ -1,4 +1,4 @@
-assume cs:code 
+assume cs:code
 
 data segment
   db '1975', '1976', '1977', '1978', '1979', '1980', '1981', '1982', '1983'
@@ -52,7 +52,7 @@ s0: push cx
 
 
 
-
+    mov ax, 4c00h
     int 21h
 
 code ends

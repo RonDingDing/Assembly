@@ -16,6 +16,7 @@ start:
     div word ptr ds:[4]
     mov ds:[6], ax
 
+    mov ax, 4c00h
     int 21H
 
 

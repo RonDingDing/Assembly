@@ -8,6 +8,7 @@ start:
     mov bx, 100
     div bx
 
+    mov ax, 4c00h
     int 21h
 code ends
 end start
