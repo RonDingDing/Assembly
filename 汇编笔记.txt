@@ -1,0 +1,122 @@
+dosbox 
+mount d 路径
+debug.exe
+
+段地址 * 16 +偏移地址
+1000:00 = 1000 * 16 + 00 = 10000
+
+-r 查看目前各寄存器状态
+-a 编辑 cs:ip 汇编代码
+-e 1000:00 编辑 10000 的二进制内容
+-d 1000:00 查看 10000 的二进制数字，不加地址是 cs:ip
+-u 1000:00 查看 10000 的汇编代码，不加地址是 cs:ip
+-t 单步执行 cs:ip 代码
+-g 跳到某一行
+-p 执行完循环
+
+mov ax, [0]  = mov ax, ds:[0]
+mov ax, [bx] =  mov ax, ds:[bx]
+ax 十六位 高八位：ah  低八位：al
+
+add ax, 8  寄存器， 数据
+add ax, bx 寄存器，寄存器
+add ax, [0]寄存器，内存单元
+add [0], ax内存单元，寄存器
+
+
+任何时刻，ss:sp指向栈顶元素
+push ax 将ax的值（16位）移动到栈ss:sp中，可以是寄存器、段寄存器、内存单元，sp = sp-2
+pop ax 将栈ss:sp中的值移动到ax，可以是寄存器、段寄存器、内存单元，sp = sp + 2
+inc ax 将ax的值+1
+
+
+assume cs:codesg
+codesg segment
+    mov ax, 0123H
+    mov bx, 0456H
+    add ax, bx
+    add ax, ax
+
+    mov ax, 4c00H
+    int 21H
+codesg ends
+end
+
+
+编译程序： masm p1.asm 然后 link p1.obj，简便模式是加上分号
+
+()表示指针，可以是寄存器、段寄存器、内存单元的物理地址
+
+(ax) (ds) (al) (cx) (2000h) ((ds) * 16 + (bx))
+
+
+mov ax, [2]  == (ax) = ((ds) * 16 + 2)
+mov [2], ax  == ((ds) * 16 + 2) = (ax) 
+add ax,  bx  == (ax) = (ax) + (bx)
+push ax      == (sp) = (sp) - 2 ; ((ss) * 16 + (sp)) = (ax) 
+pop ax       == (ax) = ((ss) * 16 + (sp)) ; (sp) = (sp) + 2
+mov ax, (bx) == (ax) = ((ds) * 16 + (bx))
+and al, 10010000 将ax的低位八字节与10010000进行与操作
+or  al, 10010000 将ax的低位八字节与10010000进行或操作
+
+在ASCII码中，第五位是0表示大写，第五位是1表示小写
+
+cx 会在每一次循环减一，不为0则继续回到s
+
+assume cs:code
+code segment
+    mov ax, 2
+
+    mov cx, 11  
+s:  add ax, ax
+    loop s
+
+    mov ax, 4c00H
+    int 21H
+code ends
+end
+
+程序被DOS加载后，ds中存放着程序所在内存区的段地址，这个内存区的偏移地址为0，则程序所在的内存区地址为ds:0
+这个内存区的前256个字节存放的是PSP，DOS用来和程序进行通信。从256字节（10H）处向后的空间存放的是程序。
+
+在汇编源程序中，数据不能以字母开头
+
+mov ax, [bx+200] == (ax) = ((ds) * 16 + (bx) + 200) == mov ax, 200[bx] == mov ax, [bx].200
+
+si di 的功能和bx相近，但是si和di不能分成两个8位寄存器。
+
+mov bx, 0/mov ax,[bx] == mov si, 0/mov ax,[si] == mov di, 0/mov ax,[di]
+
+mov ax, [bx+si] == (ax) = ((ds) * 16 + (bx) + (si)) == mov ax, [bx][si]
+
+mov ax, [bx+si+200] == mov ax, [bx+200+si] == mov ax, [200+bx+si] == mov ax, 200[bx][si] == mov ax, [bx].200[si] == mov ax, [bx][si].200
+
+段寄存器包括：ds ss cs es 
+寄存器包括：  ax    bx    cx    dx    sp bp si di
+             ah al bh bl ch cl dh dl
+
+bx si di bp 可用于 [] 中
+
+只能如此组合
+mov ax, [bx]
+mov ax, [si]
+mov ax, [di]
+mov ax, [bp]
+mov ax, [bx+si]
+mov ax, [bx+di]
+mov ax, [bp+si]
+mov ax, [bp+di]
+mov ax, [bx+si+idata]
+mov ax, [bx+di+idata]
+mov ax, [bp+si+idata]
+mov ax, [bp+di+idata]
+
+使用寄存器bp，若没有显性给出段地址，段地址默认在 ss 中。
+mov ax, [bp] == (ax) =((ss) * 16 +(bp))
+mov ax, [bp+idata] == (ax) =((ss) * 16 +(bp) + idata)
+
+
+立即数执行前在CPU的指令缓冲器中
+寄存器的数据储存在CPU中
+段寄存器的数据储存在内存中
+

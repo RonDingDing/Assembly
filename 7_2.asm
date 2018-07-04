@@ -10,10 +10,8 @@ start:
     mov ax, datasg
     mov ds, ax
     
-    mov bx, 0
- 
+    mov bx, 0 
     mov cx, 5
-
 s:  mov al, [bx]
     and al, 11011111B
     mov [bx], al

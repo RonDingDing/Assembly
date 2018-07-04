@@ -1,6 +1,6 @@
 assume cs:codesg, ds:datasg, ss:stacksg
 datasg segment
-  db 'ibm             
+  db 'ibm             '
   db 'dec             '
   db 'dos             '
   db 'vax             '
