@@ -192,3 +192,19 @@ jcxz 是有条件转移指令，机器码中包含位移，不是目的地址，
 
 jxcz 标号相当于  if ((cx) == 0) jmp short 标号
 loop 标号相当于  cx --; if (cx != 0) jmp short 标号
+
+ret指令用栈中的数据修改ip的内容从而实现近转移
+retf指令用栈中的数据修改cs和ip的内容，从而实现远转移
+
+ret == (ip) = ((ss) * 16 + (sp)); (sp) = (sp) +2
+retf == (ip) = ((ss) * 16 + (sp)); (sp) = (sp) +2; (cs) = ((ss) * 16 + (sp)); (sp) = (sp) + 2 
+
+call 标号 == (sp) = (sp) - 2; ((ss) * 16 + (sp)) = (ip); (ip) = (ip) + 16位位移
+相当于 push ip; jump near ptr
+
+call far ptr 标号 == (sp) = (sp) - 2; ((ss) * 16 + (sp)) = (cs); (sp) = (sp) - 2; ((ss) * 16 + (sp)) = (ip)
+(cs) = 标号所在的段的段地址， (ip) = 标号在段中的偏移地址
+相当于 push cs; push ip; jmp far ptr 标号
+
+call 16位reg == (sp) = (sp) - 2; ((ss) * 16 + (sp)) = (cs); (ip) = (16位reg)
+相当于 push ip; jmp 16位reg
