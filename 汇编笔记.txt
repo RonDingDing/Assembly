@@ -208,3 +208,19 @@ call far ptr 标号 == (sp) = (sp) - 2; ((ss) * 16 + (sp)) = (cs); (sp) = (sp) -
 
 call 16位reg == (sp) = (sp) - 2; ((ss) * 16 + (sp)) = (cs); (ip) = (16位reg)
 相当于 push ip; jmp 16位reg
+
+call word ptr 内存单元地址 == push ip; jmp word ptr 内存单元地址
+call dword ptr 内存单元地址 == push ip; jmp dword ptr 内存单元地址
+
+
+call ret 可以连用，作为函数的持续调用
+
+mul 两个相乘的数，要么都是8位，要么都是16位，如果是8位，一个放在al中，一个放在8位reg或内存字节单元中；
+如果是16位，一个放在ax中，另一个放在16位reg或内存单元中
+
+如果8位乘法，结果在ax中；如果是16位乘法，结果高位放在dx中，低位放在ax中。
+
+mul word ptr ds:[0] == (ax) = (al) * ((ds) * 16 + 0)
+
+mul word ptr [bx+si+8] == (ax) = (ax) * ((ds) * 16 + (bx) + (si) + 8) 结果的低16位；
+                          (dx) = (ax) * ((ds) * 16 + (bx) + (si) + 8) 结果的高16位。
